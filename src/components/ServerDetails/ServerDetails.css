@@ -1,0 +1,139 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.ServerDetails-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.ServerDetails-main {
+  flex: 1;
+  padding: 20px;
+  background-color: #f4f4f4;
+  overflow-y: auto;
+}
+
+.ServerDetails-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #5c5b5b;
+}
+
+.ServerDetails-table th {
+  padding: 12px 16px;
+  border: 1px solid #7c7c7c;
+  background-color: #15325f;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: center;
+}
+
+.ServerDetails-table td {
+  padding: 12px 16px;
+  border: 1px solid #7c7c7c;
+  text-align: center;
+}
+
+.ServerDetails-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.ServerDetails-nav {
+  background-color: #15325f;
+  padding: 12px 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.ServerDetails-logo {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.ServerDetails-logo-img {
+  width: 110px;
+  height: auto;
+}
+
+.ServerDetails-footer {
+  background-color: #15325f;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  margin: 0;
+}
+
+.header-row-ServerDetails {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  padding: 0 20px
+}
+
+.serverFilter-label-ServerDetails {
+  margin-left: 4px;;
+  margin-right: 4px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.serverFilter-ServerDetails {
+  margin-left: 4px; 
+  margin-right: auto;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  cursor: pointer;  
+}
+
+.ServerDetails-title {
+  margin: 0;
+  font-size: 24px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.export-button-ServerDetails {
+  margin-left: auto;
+  margin-right: 3px;
+  padding: 6px 4px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  background-color: #15325f;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 80px;
+  text-align: center;
+}
+
+
+.export-button-ServerDetails:hover {
+  background-color: #274f8b;
+}
+
+.highlight-green-ServerDetails {
+  background-color: #e0f7fa !important; 
+}
+
+.highlight-red-ServerDetails {
+  background-color: #a893e835 !important;
+}

@@ -1,0 +1,46 @@
+.menu-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  background-image: url("../images/bgMitel.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-family: Arial, sans-serif;
+}
+
+.menu-page h1 {
+  text-align: center;
+  color: #fff;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  justify-items: center;
+
+}
+
+.menu-button {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  background-color: #1d4581;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.menu-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
