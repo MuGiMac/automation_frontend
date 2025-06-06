@@ -1,32 +1,47 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'; 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import './ServerDetails.css';
 import '../images/logo.png';
 import { Link } from 'react-router-dom';
-
-const INTEGRATION_SERVERS = ['MCHP021A', 'MCHP026A', 'MCHP025A'];
-const PRODUCTION_SERVERS = ['MCHP029A', 'MCHP028A', 'MCHP027A'];
+import { All_SERVERS_API } from '../apiEndpints';
 
 const ServerDetails = () => {
   const [serverData, setServerData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverFilter, setServerFilter] = useState('both');
+  const [integrationServers, setIntegrationServers] = useState([]);
+  const [productionServers, setProductionServers] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3001/servers')
+    fetch(All_SERVERS_API.ALL_SERVERS)
       .then(response => response.json())
       .then(data => {
+        console.log('Raw API data:', data);
+
         const transformed = data.map(server => ({
-          name: server.name,
-          hostName: server.host_name,
-          ip: server.ip_address,
-          os: server.os_name,
-          ram: server.ram_gb,
+          name: server.serverName,
+          hostName: server.hostName,
+          ip: server.ipAddress,
+          os: server.osName,
+          ram: server.ramGb,
           cores: server.cores,
           owner: server.owner,
-          env: server.environment,
+          env: Number(server.environment),
         }));
+
+        console.log('Transformed data:', transformed);
+
+        const integration = transformed
+          .filter(server => server.env === 2)
+          .map(server => server.name);
+
+        const production = transformed
+          .filter(server => server.env === 1)
+          .map(server => server.name);
+
+        setIntegrationServers(integration);
+        setProductionServers(production);
         setServerData(transformed);
         setLoading(false);
       })
@@ -37,7 +52,13 @@ const ServerDetails = () => {
   }, []);
 
   const exportToExcel = () => {
-    const filteredData = serverData.map(server => ({
+    const filteredExportData = serverData.filter(server => {
+      if (serverFilter === 'integration') return integrationServers.includes(server.name);
+      if (serverFilter === 'production') return productionServers.includes(server.name);
+      return true;
+    });
+
+    const filteredData = filteredExportData.map(server => ({
       'Server Name': server.name,
       'Host Name': server.hostName,
       'IP Address': server.ip,
@@ -45,8 +66,13 @@ const ServerDetails = () => {
       'RAM (GB)': server.ram,
       'Cores': server.cores,
       'Owner': server.owner,
-      'Environment': server.env
+      'Environment': server.env === 1 ? 'Production' : server.env === 2 ? 'Integration' : 'Other',
     }));
+
+    if (filteredData.length === 0) {
+      alert('No data available to export');
+      return;
+    }
 
     const worksheet = XLSX.utils.json_to_sheet(filteredData);
     const columnWidths = Object.keys(filteredData[0]).map(key => {
@@ -65,7 +91,12 @@ const ServerDetails = () => {
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
 
-    saveAs(data, 'server_details.xlsx');
+    let fileName = 'server_information';
+    if (serverFilter === 'production') fileName += '_production';
+    else if (serverFilter === 'integration') fileName += '_integration';
+    fileName += '.xlsx';
+
+    saveAs(data, fileName);
   };
 
   const handleFilterChange = (e) => {
@@ -73,8 +104,8 @@ const ServerDetails = () => {
   };
 
   const filteredData = serverData.filter(server => {
-    if (serverFilter === 'integration') return INTEGRATION_SERVERS.includes(server.name);
-    if (serverFilter === 'production') return PRODUCTION_SERVERS.includes(server.name);
+    if (serverFilter === 'integration') return integrationServers.includes(server.name);
+    if (serverFilter === 'production') return productionServers.includes(server.name);
     return true;
   });
 
@@ -83,7 +114,7 @@ const ServerDetails = () => {
       <nav className="ServerDetails-nav">
         <div className="ServerDetails-logo">
           <Link to="/menu">
-           <img src={require('../images/logo.png')} alt="Logo" className="CpuMemory-logo-img" />
+            <img src={require('../images/logo.png')} alt="Logo" className="CpuMemory-logo-img" />
           </Link>
         </div>
         <div className="ServerDetails-nav-spacer"></div>
@@ -97,7 +128,7 @@ const ServerDetails = () => {
           <option value="production">Production</option>
         </select>
 
-        <h1 className="ServerDetails-title">🖥️ Server Details</h1>
+        <h1 className="ServerDetails-title">🖥️ Server Information</h1>
         <button onClick={exportToExcel} className="export-button-ServerDetails">
           Export
         </button>
@@ -123,9 +154,9 @@ const ServerDetails = () => {
             <tbody>
               {filteredData.map((server, index) => {
                 let rowClass = '';
-                if (INTEGRATION_SERVERS.includes(server.name)) {
+                if (integrationServers.includes(server.name)) {
                   rowClass = 'highlight-green-ServerDetails';
-                } else if (PRODUCTION_SERVERS.includes(server.name)) {
+                } else if (productionServers.includes(server.name)) {
                   rowClass = 'highlight-red-ServerDetails';
                 }
 
@@ -138,7 +169,7 @@ const ServerDetails = () => {
                     <td>{server.ram}</td>
                     <td>{server.cores}</td>
                     <td>{server.owner}</td>
-                    <td>{server.env}</td>
+                    <td>{server.env === 1 ? 'Production' : server.env === 2 ? 'Integration' : 'Other'}</td>
                   </tr>
                 );
               })}
