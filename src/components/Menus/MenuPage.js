@@ -11,7 +11,7 @@ const MenuPage = () => {
 
         <div className="menu-grid">
           <button onClick={() => navigate('/serverdetails')} className="menu-button">
-            Server Details
+            Server Information
           </button>
 
           <button onClick={() => alert('Coming Soon')} className="menu-button">
