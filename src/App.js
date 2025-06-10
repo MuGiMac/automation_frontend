@@ -8,6 +8,10 @@ import DriveSpace from './components/DriveSpace/DriveSpace';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
+  //const [loggedIn, setLoggedIn] = useState(() => {
+   // return sessionStorage.getItem('auth') !== null;
+  //});
+
   return (
     <Router basename="/automation_frontend">
       <Routes>
