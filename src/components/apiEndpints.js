@@ -1,11 +1,3 @@
-//const BASE_URL = '';
-
-/*
-const AUTH_API = {
-  LOGIN: `${BASE_URL}/auth/login`,
-};
-*/
-
 const All_SERVERS_API = {
   ALL_SERVERS: '/AutomationAPI/mchp021a/api/servers/allServers',
 };
@@ -16,8 +8,14 @@ const CPU_MEMORY_API = {
 	CM_API_025A: '/AutomationAPI/mchp025a/api/usage/CPUMemoryUsage',
 };
 
+const DRIVE_SPACE_API = {
+	DS_API_021A: '/AutomationAPI/mchp021a/api/drive/diskSpace',
+	DS_API_026A: '/AutomationAPI/mchp026a/api/drive/diskSpace',
+	DS_API_025A: '/AutomationAPI/mchp025a/api/drive/diskSpace',
+};
+
 export {
-  //AUTH_API,
   All_SERVERS_API,
-  CPU_MEMORY_API
+  CPU_MEMORY_API,
+  DRIVE_SPACE_API
 };

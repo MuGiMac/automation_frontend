@@ -14,12 +14,16 @@ const MenuPage = () => {
             Server Information
           </button>
 
-          <button onClick={() => alert('Coming Soon')} className="menu-button">
-            Check Processed LDAP Logs
-          </button>
-
           <button onClick={() => navigate('/cpumemory')} className="menu-button">
             CPU and Memory Consumption
+          </button>
+
+          <button onClick={() => navigate('/drivespace')} className="menu-button">
+            Check Drive Free Space of all servers
+          </button>
+
+          <button onClick={() => alert('Coming Soon')} className="menu-button">
+            Check Processed LDAP Logs
           </button>
 
           <button onClick={() => alert('Coming Soon')} className="menu-button">
@@ -34,10 +38,6 @@ const MenuPage = () => {
             Check Windows Schedulers Status
           </button>
 
-          <button onClick={() => navigate('/drivespace')} className="menu-button">
-            Check Drive Free Space of all servers
-          </button>
-
           <button onClick={() => alert('Coming Soon')} className="menu-button">
             Check Status of Identity Workflows
           </button>
@@ -49,6 +49,11 @@ const MenuPage = () => {
           <button onClick={() => alert('Coming Soon')} className="menu-button">
             Check Status of Request Workflows
           </button>
+
+          <button onClick={() => navigate('/dashboard')} className="menu-button">
+            Failure OverView
+          </button>
+
         </div>
       </div>
     </div>

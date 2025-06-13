@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import './DriveSpace.css';
-import '../images/logo.png';
+import logo from '../images/logo.png';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import { Link } from 'react-router-dom';
 
 const INTEGRATION_SERVERS = ['MCHP021A', 'MCHP026A', 'MCHP025A'];
@@ -9,85 +11,70 @@ const PRODUCTION_SERVERS = ['MCHP029A', 'MCHP028A', 'MCHP027A'];
 const MOCK_DRIVE_DATA = [
   {
     serverName: "MCHP021A",
-    drives: {
-      C: 99.9,
-      D: 19.9,
-      H: 428,
-    },
+    diskSpace: [
+      { drive: "C", freeSpace: "131.60", totalSpace: "237.32" },
+      { drive: "D", freeSpace: "100.00", totalSpace: "200.00" },
+      { drive: "H", freeSpace: "50.00", totalSpace: "100.00" },
+    ]
   },
   {
     serverName: "MCHP026A",
-    drives: {
-      C: 99.9,
-      D: 19.9,
-      H: 149,
-    },
+    diskSpace: [
+      { drive: "C", freeSpace: "110.50", totalSpace: "220.00" },
+      { drive: "D", freeSpace: "90.00", totalSpace: "180.00" },
+      { drive: "H", freeSpace: "70.00", totalSpace: "150.00" },
+    ]
   },
   {
     serverName: "MCHP025A",
-    drives: {
-      C: 99.9,
-      D: 99.9,
-      H: null,
-    },
+    diskSpace: [
+      { drive: "C", freeSpace: "80.00", totalSpace: "180.00" },
+      { drive: "D", freeSpace: "60.00", totalSpace: "120.00" },
+    ]
   },
   {
     serverName: "MCHP029A",
-    drives: {
-      C: 99.9,
-      D: 19.9,
-      H: 149,
-    },
+    diskSpace: [
+      { drive: "C", freeSpace: "99.90", totalSpace: "200.00" },
+      { drive: "D", freeSpace: "40.00", totalSpace: "120.00" },
+      { drive: "H", freeSpace: "60.00", totalSpace: "150.00" },
+    ]
   },
   {
     serverName: "MCHP028A",
-    drives: {
-      C: 99.9,
-      D: 19.9,
-      H: 149,
-    },
+    diskSpace: [
+      { drive: "C", freeSpace: "70.00", totalSpace: "200.00" },
+      { drive: "D", freeSpace: "50.00", totalSpace: "100.00" },
+      { drive: "H", freeSpace: "45.00", totalSpace: "150.00" },
+    ]
   },
   {
     serverName: "MCHP027A",
-    drives: {
-      C: 99.9,
-      D: 19.9,
-      H: null,
-    },
+    diskSpace: [
+      { drive: "C", freeSpace: "60.00", totalSpace: "180.00" },
+      { drive: "D", freeSpace: "30.00", totalSpace: "100.00" },
+    ]
   },
 ];
-
-const exportToExcel = () => {
-
-};
-
-const getRandomUsed = (total) => {
-  if (!total) return null;
-  return +(total * (0.1 + Math.random() * 0.85)).toFixed(2);
-};
 
 const DriveSpace = () => {
   const [driveEntries, setDriveEntries] = useState([]);
   const [serverFilter, setServerFilter] = useState('both');
+  const [driveFilter, setDriveFilter] = useState('ALL');
 
   useEffect(() => {
     const entries = [];
 
-    MOCK_DRIVE_DATA.forEach(({ serverName, drives }) => {
-      Object.entries(drives).forEach(([drive, total]) => {
-        if (total === null || total === undefined) return;
-
-        const used = getRandomUsed(total);
-        const free = +(total - used).toFixed(2);
-        const freePercent = +((free / total) * 100).toFixed(1);
+    MOCK_DRIVE_DATA.forEach(({ serverName, diskSpace }) => {
+      diskSpace.forEach(({ drive, freeSpace, totalSpace }) => {
+        const total = parseFloat(totalSpace);
+        const free = parseFloat(freeSpace);
 
         entries.push({
           serverName,
           drive,
           total,
-          used,
           free,
-          freePercent,
         });
       });
     });
@@ -97,10 +84,8 @@ const DriveSpace = () => {
     const interval = setInterval(() => {
       setDriveEntries(prevEntries =>
         prevEntries.map(entry => {
-          const used = getRandomUsed(entry.total);
-          const free = +(entry.total - used).toFixed(2);
-          const freePercent = +((free / entry.total) * 100).toFixed(1);
-          return { ...entry, used, free, freePercent };
+          const free = +(entry.total * (0.1 + Math.random() * 0.85)).toFixed(2);
+          return { ...entry, free };
         })
       );
     }, 10000);
@@ -112,9 +97,61 @@ const DriveSpace = () => {
     setServerFilter(e.target.value);
   };
 
-  const filteredEntries = driveEntries.filter(({ serverName }) => {
-    if (serverFilter === 'integration') return INTEGRATION_SERVERS.includes(serverName);
-    if (serverFilter === 'production') return PRODUCTION_SERVERS.includes(serverName);
+  const handleDriveFilterChange = (e) => {
+    setDriveFilter(e.target.value);
+  };
+
+  const exportToExcel = () => {
+
+    const filteredExportData = driveEntries.filter(({ serverName, drive }) => {
+      if (serverFilter === 'integration' && !INTEGRATION_SERVERS.includes(serverName)) return false;
+      if (serverFilter === 'production' && !PRODUCTION_SERVERS.includes(serverName)) return false;
+      if (driveFilter !== 'ALL' && drive !== driveFilter) return false;
+      return true;
+    });
+
+    const formattedData = filteredExportData.map(entry => ({
+      'Server Name': entry.serverName,
+      'Drive': entry.drive,
+      'Total Space (GB)': entry.total.toFixed(2),
+      'Free Space (GB)': entry.free.toFixed(2),
+    }));
+
+    if (filteredExportData.length === 0) {
+      alert('No data available to export');
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+
+    const columnWidths = Object.keys(formattedData[0]).map(key => {
+      const maxLength = Math.max(
+        key.length,
+        ...formattedData.map(row => String(row[key] || '').length)
+      );
+      return { wch: maxLength + 2 };
+    });
+    worksheet['!cols'] = columnWidths;
+
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'DriveSpace');
+
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+    let fileName = 'drive_space';
+    if (serverFilter !== 'both') fileName += `_${serverFilter}`;
+    if (driveFilter !== 'ALL') fileName += `_${driveFilter.toLowerCase()}_drive`;
+    fileName += '.xlsx';
+
+    saveAs(blob, fileName);
+  };
+
+  const filteredExportData = driveEntries.filter(({ serverName, drive }) => {
+    if (serverFilter === 'integration' && !INTEGRATION_SERVERS.includes(serverName)) return false;
+    if (serverFilter === 'production' && !PRODUCTION_SERVERS.includes(serverName)) return false;
+    if (driveFilter !== 'ALL' && drive !== driveFilter) return false;
     return true;
   });
 
@@ -123,20 +160,42 @@ const DriveSpace = () => {
       <nav className="DriveSpace-nav">
         <div className="DriveSpace-logo">
           <Link to="/menu">
-           <img src={require('../images/logo.png')} alt="Logo" className="CpuMemory-logo-img" />
+            <img src={logo} alt="Logo" className="DriveSpace-logo-img" />
           </Link>
         </div>
         <div className="DriveSpace-nav-spacer"></div>
       </nav>
 
       <div className="header-row-DriveSpace">
-        <label htmlFor="serverFilter" className="serverFilter-label-DriveSpace">Filter By Server Type :</label>
-        <select id="serverFilter" value={serverFilter} onChange={handleFilterChange} className="serverFilter-DriveSpace" >
-          <option value="both">Both</option>
-          <option value="integration">Integration</option>
-          <option value="production">Production</option>
-        </select>
-        <h1 className="DriveSpace-title">💾 Server Drive Space Dashboard</h1>
+        <div className="filters-group">
+          <label htmlFor="serverFilter" className="serverFilter-label-DriveSpace">Filter By Server Type :</label>
+          <select
+            id="serverFilter"
+            value={serverFilter}
+            onChange={handleFilterChange}
+            className="serverFilter-DriveSpace"
+          >
+            <option value="both">Both</option>
+            <option value="integration">Integration</option>
+            <option value="production">Production</option>
+          </select>
+
+          <label htmlFor="driveFilter" className="serverFilter-label-DriveSpace">Filter By Drive :</label>
+          <select
+            id="driveFilter"
+            value={driveFilter}
+            onChange={handleDriveFilterChange}
+            className="serverFilter-DriveSpace"
+          >
+            <option value="ALL">ALL</option>
+            <option value="C">C Drive</option>
+            <option value="D">D Drive</option>
+            <option value="H">H Drive</option>
+          </select>
+        </div>
+
+        <h1 className="DriveSpace-title">💾 Drive Space Dashboard</h1>
+
         <button onClick={exportToExcel} className="export-button-DriveSpace">
           Export
         </button>
@@ -149,13 +208,11 @@ const DriveSpace = () => {
               <th>Server Name</th>
               <th>Drive</th>
               <th>Total Space (GB)</th>
-              <th>Used Space (GB)</th>
               <th>Free Space (GB)</th>
-              <th>Free Space (%)</th>
             </tr>
           </thead>
           <tbody>
-            {filteredEntries.map(({ serverName, drive, total, used, free, freePercent }, i) => {
+            {filteredExportData.map(({ serverName, drive, total, free }, i) => {
               let rowClass = '';
 
               if (INTEGRATION_SERVERS.includes(serverName)) {
@@ -164,15 +221,21 @@ const DriveSpace = () => {
                 rowClass = 'highlight-red-DriveSpace';
               }
 
+              const freePercent = (free / total) * 100;
+
               return (
                 <tr key={i} className={rowClass}>
                   <td>{serverName}</td>
                   <td>{drive}</td>
                   <td>{total.toFixed(1)}</td>
-                  <td>{used.toFixed(1)}</td>
-                  <td>{free.toFixed(1)}</td>
-                  <td className={freePercent < 30 ? 'alert-DriveSpace' : 'normal-DriveSpace'}>
-                    {freePercent}% {freePercent < 30 && '⚠️'}
+                  <td>
+                    {freePercent < 30 ? (
+                      <span className="warning">
+                        {free.toFixed(1)} <span className="warning-icon">⚠️</span>
+                      </span>
+                    ) : (
+                      `${free.toFixed(1)}`
+                    )}
                   </td>
                 </tr>
               );

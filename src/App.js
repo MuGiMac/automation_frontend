@@ -5,12 +5,13 @@ import MenuPage from './components/Menus/MenuPage';
 import CpuMemory from './components/CpuMemory/CpuMemory';
 import ServerDetails from './components/ServerDetails/ServerDetails';
 import DriveSpace from './components/DriveSpace/DriveSpace';
+import Dashboard from './components/Dashboard/Dashboard';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  //const [loggedIn, setLoggedIn] = useState(() => {
-   // return sessionStorage.getItem('auth') !== null;
-  //});
+  //const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(() => {
+    return sessionStorage.getItem('auth') !== true;
+  });
 
   return (
     <Router basename="/automation_frontend">
@@ -36,6 +37,10 @@ function App() {
         <Route
           path="/drivespace"
           element={loggedIn ? <DriveSpace /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/dashboard"
+          element={loggedIn ? <Dashboard /> : <Navigate to="/" />}
         />
       </Routes>
     </Router>

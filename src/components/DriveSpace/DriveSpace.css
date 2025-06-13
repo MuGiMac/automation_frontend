@@ -10,43 +10,48 @@ html, body {
 }
 
 .header-row-DriveSpace {
-  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   height: 60px;
   padding: 0 20px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.serverFilter-label-DriveSpace {
-  margin-left: 4px;;
-  margin-right: 4px;
+.filters-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.serverFilter-label-DriveSpace,
+.serverFilter-DriveSpace {
+  margin: 0;
   font-size: 16px;
   font-weight: bold;
 }
 
 .serverFilter-DriveSpace {
-  margin-left: 4px; 
-  margin-right: auto;
   padding: 4px 8px;
   font-size: 14px;
-  font-weight: bold;
+  cursor: pointer;
   transition: background-color 0.3s ease;
-  cursor: pointer;  
+  font-weight: bold;
 }
 
 .DriveSpace-title {
-  margin: 0;
+  text-indent: -420px;
+  flex-grow: 1;
+  text-align: center;
   font-size: 24px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .export-button-DriveSpace {
-  margin-left: auto;
-  margin-right: 3px;
-  padding: 6px 4px;
+  margin: 0;
+  padding: 6px 12px;
   font-size: 14px;
   font-weight: bold;
   color: white;
@@ -70,7 +75,7 @@ html, body {
   border-collapse: collapse;
   background-color: #fff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid #5c5b5b
+  border: 1px solid #5c5b5b;
 }
 
 .DriveSpace-table th {
@@ -95,7 +100,7 @@ html, body {
 }
 
 .highlight-green-DriveSpace {
-  background-color: #e0f7fa !important; 
+  background-color: #e0f7fa !important;
 }
 
 .highlight-red-DriveSpace {
@@ -140,4 +145,17 @@ html, body {
   color: white;
   text-align: center;
   padding: 10px;
+}
+
+.warning {
+  color: red;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.warning-icon {
+  font-size: 16px;
+  line-height: 1;
 }
