@@ -4,18 +4,28 @@ import { saveAs } from 'file-saver';
 import './ServerDetails.css';
 import '../images/logo.png';
 import { Link } from 'react-router-dom';
-import { All_SERVERS_API } from '../apiEndpints';
+import { All_SERVERS_API, getAuthHeaders } from '../API/apiEndpoints';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../Services/authServices';
 
-const ServerDetails = () => {
+const ServerDetails = ({ onLogout }) => {
   const [serverData, setServerData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverFilter, setServerFilter] = useState('both');
   const [integrationServers, setIntegrationServers] = useState([]);
   const [productionServers, setProductionServers] = useState([]);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    onLogout();
+    navigate('/');
+  };
 
   useEffect(() => {
-    fetch(All_SERVERS_API.ALL_SERVERS)
+    fetch(All_SERVERS_API.ALL_SERVERS, getAuthHeaders())
       .then(response => response.json())
+      .catch(err => console.error('API Error:', err))
       .then(data => {
         console.log('Raw API data:', data);
 
@@ -118,6 +128,9 @@ const ServerDetails = () => {
           </Link>
         </div>
         <div className="ServerDetails-nav-spacer"></div>
+        <button className="logout-button-ServerDetails" onClick={handleLogout}>
+          Logout
+        </button>
       </nav>
 
       <div className="header-row-ServerDetails">

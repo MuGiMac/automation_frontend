@@ -77,7 +77,6 @@ html, body {
 }
 
 
-
 .CpuMemory-card {
   background-color: #ffffff;
   padding: 16px;
@@ -174,4 +173,24 @@ html, body {
 
 .highlight-red-CpuMemory {
   background-color: #a893e835 !important;
+}
+
+.logout-button-CpuMemory {
+  margin-left: auto;
+  margin-right: 3px;
+  padding: 6px 4px;
+  font-size: 15px;
+  font-weight: bold;
+  color: white;
+  background-color: #15325f;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 80px;
+  text-align: center;
+}
+
+.logout-button-CpuMemory:hover {
+  background-color: #274f8b;
 }

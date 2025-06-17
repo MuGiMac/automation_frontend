@@ -1,25 +1,39 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './components/Login';
+import { useState, useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login/Login';
 import MenuPage from './components/Menus/MenuPage';
 import CpuMemory from './components/CpuMemory/CpuMemory';
 import ServerDetails from './components/ServerDetails/ServerDetails';
 import DriveSpace from './components/DriveSpace/DriveSpace';
 import Dashboard from './components/Dashboard/Dashboard';
+import { getToken } from './components/Services/authServices';
 
 function App() {
-  //const [loggedIn, setLoggedIn] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(() => {
-    return sessionStorage.getItem('auth') !== true;
-  });
+  const [loggedIn, setLoggedIn] = useState(() => !!getToken());
+
+  useEffect(() => {
+    const checkToken = () => {
+      const token = getToken();
+      setLoggedIn(!!token);
+    };
+
+    checkToken();
+
+    window.addEventListener('storage', checkToken);
+    return () => window.removeEventListener('storage', checkToken);
+  }, []);
 
   return (
-    <Router basename="/automation_frontend">
+    <Router>
       <Routes>
         <Route
           path="/"
           element={
-            loggedIn ? <Navigate to="/menu" /> : <Login onLogin={() => setLoggedIn(true)} />
+            loggedIn ? (
+              <Navigate to="/menu" />
+            ) : (
+              <Login onLogin={() => setLoggedIn(true)} />
+            )
           }
         />
         <Route
@@ -28,11 +42,11 @@ function App() {
         />
         <Route
           path="/cpumemory"
-          element={loggedIn ? <CpuMemory /> : <Navigate to="/" />}
+          element={loggedIn ? <CpuMemory onLogout={() => setLoggedIn(false)} /> : <Navigate to="/" />}
         />
         <Route
           path="/serverdetails"
-          element={loggedIn ? <ServerDetails /> : <Navigate to="/" />}
+          element={loggedIn ? <ServerDetails onLogout={() => setLoggedIn(false)} /> : <Navigate to="/" />}
         />
         <Route
           path="/drivespace"
@@ -40,7 +54,7 @@ function App() {
         />
         <Route
           path="/dashboard"
-          element={loggedIn ? <Dashboard /> : <Navigate to="/" />}
+          element={loggedIn ? <Dashboard onLogout={() => setLoggedIn(false)} /> : <Navigate to="/" />}
         />
       </Routes>
     </Router>
