@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/automation_frontend/static/css/main.fc331219.css",
-    "main.js": "/automation_frontend/static/js/main.fec4facc.js",
+    "main.css": "/automation_frontend/static/css/main.2d7d7ffb.css",
+    "main.js": "/automation_frontend/static/js/main.7a106a6d.js",
     "static/js/453.5d8ff40c.chunk.js": "/automation_frontend/static/js/453.5d8ff40c.chunk.js",
     "static/media/bgMitel.jpg": "/automation_frontend/static/media/bgMitel.b5b008da7d3d3af7ced0.jpg",
     "index.html": "/automation_frontend/index.html",
-    "main.fc331219.css.map": "/automation_frontend/static/css/main.fc331219.css.map",
-    "main.fec4facc.js.map": "/automation_frontend/static/js/main.fec4facc.js.map",
+    "main.2d7d7ffb.css.map": "/automation_frontend/static/css/main.2d7d7ffb.css.map",
+    "main.7a106a6d.js.map": "/automation_frontend/static/js/main.7a106a6d.js.map",
     "453.5d8ff40c.chunk.js.map": "/automation_frontend/static/js/453.5d8ff40c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.fc331219.css",
-    "static/js/main.fec4facc.js"
+    "static/css/main.2d7d7ffb.css",
+    "static/js/main.7a106a6d.js"
   ]
 }

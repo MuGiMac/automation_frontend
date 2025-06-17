@@ -4,18 +4,27 @@ import { saveAs } from 'file-saver';
 import './CpuMemory.css';
 import '../images/logo.png';
 import { Link } from 'react-router-dom';
-import { CPU_MEMORY_API, All_SERVERS_API } from '../apiEndpints';
+import { CPU_MEMORY_API, All_SERVERS_API, getAuthHeaders } from '../API/apiEndpoints';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../Services/authServices';
 
-const CpuMemory = () => {
+const CpuMemory = ({ onLogout }) => {
   const [servers, setServers] = useState([]);
   const [integrationServers, setIntegrationServers] = useState([]);
   const [productionServers, setProductionServers] = useState([]);
   const [serverFilter, setServerFilter] = useState('both');
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    onLogout();
+    navigate('/');
+  };
 
   const fetchServers = async () => {
     try {
-      const res = await fetch(All_SERVERS_API.ALL_SERVERS);
+      const res = await fetch(All_SERVERS_API.ALL_SERVERS, getAuthHeaders());
       const data = await res.json();
 
       console.log('Raw data fetched:', data);
@@ -46,9 +55,9 @@ const CpuMemory = () => {
   };
 
   const fetchCpuMemoryData = () => {
-    const fetchServer1 = fetch(CPU_MEMORY_API.CM_API_021A).then(res => res.json());
-    const fetchServer2 = fetch(CPU_MEMORY_API.CM_API_025A).then(res => res.json());
-    const fetchServer3 = fetch(CPU_MEMORY_API.CM_API_026A).then(res => res.json());
+    const fetchServer1 = fetch(CPU_MEMORY_API.CM_API_021A, getAuthHeaders()).then(res => res.json());
+    const fetchServer2 = fetch(CPU_MEMORY_API.CM_API_025A, getAuthHeaders()).then(res => res.json());
+    const fetchServer3 = fetch(CPU_MEMORY_API.CM_API_026A, getAuthHeaders()).then(res => res.json());
 
     Promise.all([fetchServer1, fetchServer2, fetchServer3])
       .then(([data1, data2, data3]) => {
@@ -153,6 +162,9 @@ const CpuMemory = () => {
           </Link>
         </div>
         <div className="CpuMemory-nav-spacer"></div>
+        <button className="logout-button-ServerDetails" onClick={handleLogout}>
+          Logout
+        </button>
       </nav>
 
       <div className="header-row-CpuMemory">

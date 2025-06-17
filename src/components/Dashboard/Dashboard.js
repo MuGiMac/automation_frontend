@@ -2,30 +2,53 @@ import React, { useEffect, useState } from 'react';
 import './Dashboard.css';
 import '../images/logo.png';
 import { Link } from 'react-router-dom';
+import { CPU_MEMORY_API, getAuthHeaders } from '../API/apiEndpoints';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../Services/authServices';
 
-const MOCK_DATA = [
-  { serverName: "MCHP021A", cpuUsage: 34.5, usedMemory: 2048, totalMemory: 4096 },
-  { serverName: "MCHP026A", cpuUsage: 68.2, usedMemory: 3072, totalMemory: 4096 },
-  { serverName: "MCHP025A", cpuUsage: 12.3, usedMemory: 1024, totalMemory: 2048 },
-  { serverName: "MCHP029A", cpuUsage: 89.9, usedMemory: 6144, totalMemory: 8192 },
-  { serverName: "MCHP028A", cpuUsage: 45.0, usedMemory: 2048, totalMemory: 8192 },
-  { serverName: "MCHP028A", cpuUsage: 56.5, usedMemory: 4096, totalMemory: 8192 }
-];
-
-const Dashboard = () => {
+const Dashboard = ({ onLogout }) => {
   const [servers, setServers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    onLogout();
+    navigate('/');
+  };
+
+  const fetchCpuMemoryData = () => {
+    const fetchServer1 = fetch(CPU_MEMORY_API.CM_API_021A, getAuthHeaders()).then(res => res.json());
+    const fetchServer2 = fetch(CPU_MEMORY_API.CM_API_025A, getAuthHeaders()).then(res => res.json());
+    const fetchServer3 = fetch(CPU_MEMORY_API.CM_API_026A, getAuthHeaders()).then(res => res.json());
+    
+    Promise.all([fetchServer1, fetchServer2, fetchServer3])
+      .then(([data1, data2, data3]) => {
+        console.log('Raw API data from mchp021a:', data1);
+        console.log('Raw API data from mchp025a:', data2);
+        console.log('Raw API data from mchp026a:', data3);
+
+        const combined = [
+          ...(Array.isArray(data1) ? data1 : [data1]),
+          ...(Array.isArray(data2) ? data2 : [data2]),
+          ...(Array.isArray(data3) ? data3 : [data3])
+        ];
+
+        console.log('Raw API combined data:', combined);
+        setServers(combined);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching CPU/Memory data:', error);
+        setLoading(false);
+      });
+  };
 
   useEffect(() => {
-    setServers(MOCK_DATA.map(server => ({ ...server })));
+    fetchCpuMemoryData();
 
     const interval = setInterval(() => {
-      setServers(prevServers =>
-        prevServers.map(server => ({
-          ...server,
-          cpuUsage: +(Math.random() * 100).toFixed(1),
-          usedMemory: Math.floor(Math.random() * server.totalMemory),
-        }))
-      );
+      fetchCpuMemoryData();
     }, 10000);
 
     return () => clearInterval(interval);
@@ -40,6 +63,9 @@ const Dashboard = () => {
           </Link>
         </div>
         <div className="Dashboard-nav-spacer"></div>
+        <button className="logout-button-Dashboard" onClick={handleLogout}>
+          Logout
+        </button>
       </nav>
 
       <div className="header-row-Dashboard">
@@ -52,10 +78,11 @@ const Dashboard = () => {
           <div className="Dashboard-topic-box">
             <h3 className="Dashboard-topic-title">CPU Memory Usage</h3>
 
-            {(() => {
+            {loading ? (
+              <div>Loading...</div>
+            ) : (() => {
               const alertServers = servers.filter(s => {
-                const memPercent = (s.usedMemory / s.totalMemory) * 100;
-                return s.cpuUsage > 80 || memPercent > 80;
+                return s.cpuUsage > 80 || s.memoryUsage > 80;
               });
 
               if (alertServers.length === 0) {
@@ -63,13 +90,13 @@ const Dashboard = () => {
               }
 
               return alertServers.map((s, idx) => {
-                const memPercent = ((s.usedMemory / s.totalMemory) * 100).toFixed(1);
+                const memPercent = s.memoryUsage.toFixed(1);
                 const showCPU = s.cpuUsage > 80;
                 const showMemory = memPercent > 80;
 
                 return (
-                  <div key={idx} style={{ marginBottom: '10px' }}>
-                    <strong>{s.serverName}:</strong>
+                  <div key={idx} className="Dashboard-status-block">
+                    <strong>{s.serverName.toUpperCase()}:</strong>
                     <div>
                       {showCPU && (
                         <>
